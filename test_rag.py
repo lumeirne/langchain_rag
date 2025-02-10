@@ -1,3 +1,4 @@
+import os 
 import streamlit as st
 from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -80,6 +81,7 @@ EMBEDDING_MODEL = OllamaEmbeddings(model="deepseek-r1:1.5b")
 DOCUMENT_VECTOR_DB = InMemoryVectorStore(EMBEDDING_MODEL)
 LANGUAGE_MODEL = OllamaLLM(model="deepseek-r1:1.5b")
 
+os.makedirs(PDF_STORAGE_PATH, exist_ok=True)
 
 def save_uploaded_file(uploaded_file):
     file_path = PDF_STORAGE_PATH + uploaded_file.name

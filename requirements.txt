@@ -7,6 +7,3 @@ python-dotenv
 pypdf 
 langchain-huggingface
 gradio
-langchain_ollama
-pdfplumber
-langchain_core
