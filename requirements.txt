@@ -1,0 +1,9 @@
+langchain_community 
+langchain_text_splitters 
+langchain-cohere 
+langchain_chroma 
+streamlit 
+python-dotenv 
+pypdf 
+langchain-huggingface
+gradio
