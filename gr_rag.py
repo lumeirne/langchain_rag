@@ -78,6 +78,7 @@ def stream_response(message, history):
 
 chatbot = gr.ChatInterface(
     stream_response,
+    type="messages",
     textbox=gr.Textbox(placeholder="Ask the LLM...",
         container=False,
         autoscroll=True,
