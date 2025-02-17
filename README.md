@@ -27,8 +27,8 @@ RAG is a powerful architecture that enhances the capabilities of language models
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/your-repository.git
-    cd your-repository
+    git clone https://github.com//lumeirne/langchain_rag.git
+    cd langchain_rag
     ```
 
 2. Install dependencies:
