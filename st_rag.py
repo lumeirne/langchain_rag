@@ -92,25 +92,27 @@ from langchain_huggingface import HuggingFaceEmbeddings
 EMBEDDING_MODEL = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
-
-def save_uploaded_file(uploaded_file):
-    file_path = PDF_STORAGE_PATH + uploaded_file.name
+@st.cache_data
+def save_uploaded_file(_uploaded_file):
+    file_path = PDF_STORAGE_PATH + _uploaded_file.name
     with open(file_path, "wb") as file:
-        file.write(uploaded_file.getbuffer())
+        file.write(_uploaded_file.getbuffer())
     return file_path
 
-def load_pdf_documents(file_path):
-    document_loader = PDFPlumberLoader(file_path)
+@st.cache_data
+def load_pdf_documents(_file_path):
+    document_loader = PDFPlumberLoader(_file_path)
     return document_loader.load()
 
-def chunk_documents(raw_documents):
+@st.cache_data
+def chunk_documents(_raw_documents):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=300,
         chunk_overlap=100,
         length_function=len,
         is_separator_regex=False,
     )
-    chunks = text_splitter.split_documents(raw_documents)
+    chunks = text_splitter.split_documents(_raw_documents)
     
     return chunks
 
@@ -121,33 +123,30 @@ vector_store = Chroma(
     persist_directory=CHROMA_PATH,
 )
 
-def index_documents(document_chunks):
+@st.cache_data
+def index_documents(_document_chunks):
 
-    uuids = [str(uuid4()) for _ in range(len(document_chunks))]
+    uuids = [str(uuid4()) for _ in range(len(_document_chunks))]
 
-    vector_store.add_documents(documents=document_chunks, ids=uuids)
+    vector_store.add_documents(documents=_document_chunks, ids=uuids)
 
-def find_related_documents(query):
-    return vector_store.similarity_search(query)
+@st.cache_data
+def find_related_documents(_query):
+    return vector_store.similarity_search(_query)
 
-# def generate_answer(user_query, context_documents):
-#     context_text = "\n\n".join([doc.page_content for doc in context_documents])
-#     conversation_prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-#     response_chain = conversation_prompt | LANGUAGE_MODEL
-#     return response_chain.invoke({"user_query": user_query, "document_context": context_text})
 
-def generate_answer(user_query, context_documents):
+def generate_answer(_user_query, _context_documents):
     num_results = 5
     retriever = vector_store.as_retriever(search_kwargs={'k': num_results})
 
-    docs = retriever.invoke(user_query, {"document_context": context_documents})
+    docs = retriever.invoke(_user_query, {"document_context": _context_documents})
 
     knowledge = ""
 
     for doc in docs:
         knowledge += doc.page_content+"\n\n"
 
-    if user_query is not None:
+    if _user_query is not None:
 
         partial_message = ""
 
@@ -157,7 +156,7 @@ def generate_answer(user_query, context_documents):
         but solely the information in the "The knowledge" section.
         You don't mention anything to the user about the provided knowledge.
 
-        The question: {user_query}
+        The question: {_user_query}
 
         The knowledge: {knowledge}
 
@@ -165,14 +164,15 @@ def generate_answer(user_query, context_documents):
 
         for response in LANGUAGE_MODEL.stream(rag_prompt):
             partial_message += response.content
-            yield partial_message
+        
+    return partial_message
 
 
 st.title("📘 RAG Agent")
 st.markdown("### Your Intelligent Document Assistant")
 st.markdown("---")
 
-# File Upload Section
+
 uploaded_pdf = st.file_uploader(
     "Upload Research Document (PDF)",
     type="pdf",
